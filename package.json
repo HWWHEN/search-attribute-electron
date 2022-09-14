@@ -1,0 +1,55 @@
+{
+  "name": "search-electron",
+  "private": true,
+  "version": "1.0.0",
+  "main": "electron/main.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "vite",
+    "serve": "vite cross-env NODE_ENV=development --port 3000 --host",
+    "build": "vite build",
+    "preview": "vite preview",
+    "electron": "electron .",
+    "electron:serve": "concurrently -k \"yarn serve\" \"yarn electron\"",
+    "electron:build": "vite build && electron-builder"
+  },
+  "dependencies": {
+    "element-plus": "^2.2.16",
+    "vue": "^3.2.37"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^3.1.0",
+    "concurrently": "^7.4.0",
+    "cross-env": "^7.0.3",
+    "electron": "^20.1.3",
+    "electron-builder": "^23.3.3",
+    "unplugin-auto-import": "^0.11.2",
+    "unplugin-vue-components": "^0.22.7",
+    "vite": "^3.1.0",
+    "wait-on": "^6.0.1"
+  },
+  "build": {
+    "appId": "com.sywh.search-attribute-electron",
+    "productName": "searchAttribute",
+    "copyright": "Copyright © 2022 sywh",
+    "win": {
+      "icon": "./logo.ico"
+    },
+    "mac": {
+      "category": "public.app-category.utilities",
+      "icon": "./logo.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets",
+      "output": "dist_electron"
+    }
+  }
+}
