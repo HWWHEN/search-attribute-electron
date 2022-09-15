@@ -6,7 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "dev": "vite",
-    "serve": "vite --port 3000 --host",
+    "serve": "cross-env NODE_ENV=development vite --port 3000 --host",
     "build": "vite build",
     "preview": "vite preview",
     "electron": "cross-env NODE_ENV=development electron .",

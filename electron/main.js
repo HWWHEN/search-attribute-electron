@@ -22,7 +22,7 @@ function createWindow() {
   });
   // 加载 index.html
   console.log(NODE_ENV);
-  mainWindow.loadURL(NODE_ENV === "development" ? "http://localhost:3001" : `file://${path.join(__dirname, "../dist/index.html")}`);
+  mainWindow.loadURL(NODE_ENV === "development" ? "http://localhost:3000" : `file://${path.join(__dirname, "../dist/index.html")}`);
   // 打开开发工具
   // mainWindow.webContents.openDevTools();
   win = mainWindow;

@@ -2,35 +2,36 @@
 import searchAttribute from "./view/search-attribute.vue";
 import { ref } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-const ifUpdate = ref(false);
-const updateInfo = ref({});
-const ifUpdateing = ref(false);
-const ifInstall = ref(false);
-const downloadInfo = ref({});
-const ipcRenderer = require("electron").ipcRenderer;
+const ifUpdate = ref(false); //更新提示弹窗
+const ifUpdateing = ref(false); //更新进度弹窗
+const ifInstall = ref(false); //安装提示弹窗
+const updateInfo = ref({}); //更新内容
+const downloadInfo = ref({}); //下载进度
+if (typeof require != "undefined") {
+  //非electron环境没有require，判断为非electron时不使用ipc
+  const ipcRenderer = require("electron").ipcRenderer;
+  // 收到主进程可更新的消息，做自己的业务逻辑
+  ipcRenderer.on("updateAvailable", (event, data) => {
+    updateInfo.value = data;
+    ifUpdate.value = true;
+  });
 
-// 5. 收到主进程可更新的消息，做自己的业务逻辑
-ipcRenderer.on("updateAvailable", (event, data) => {
-  updateInfo.value = data;
-  ifUpdate.value = true;
-});
+  //打印消息
+  ipcRenderer.on("printUpdaterMessage", (event, data) => {
+    ElMessage.success(data);
+  });
 
-//打印消息
-ipcRenderer.on("printUpdaterMessage", (event, data) => {
-  ElMessage.success(data);
-});
+  //收到进度信息，做进度条
+  ipcRenderer.on("downloadProgress", (event, data) => {
+    downloadInfo.value = data;
+  });
 
-//收到进度信息，做进度条
-ipcRenderer.on("downloadProgress", (event, data) => {
-  downloadInfo.value = data;
-});
-
-//  下载完成，反馈给用户是否立即更新
-ipcRenderer.on("updateDownloaded", (event, data) => {
-  ifUpdateing.value = false;
-  ifInstall.value = true;
-});
-
+  //  下载完成，反馈给用户是否立即更新
+  ipcRenderer.on("updateDownloaded", (event, data) => {
+    ifUpdateing.value = false;
+    ifInstall.value = true;
+  });
+}
 //  告诉主进程，立即更新
 function updateNow() {
   ipcRenderer.send("updateNow");
