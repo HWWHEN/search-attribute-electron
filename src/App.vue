@@ -20,23 +20,23 @@ ipcRenderer.on("printUpdaterMessage", (event, data) => {
   ElMessage.success(data);
 });
 
-// 9. 收到进度信息，做进度条
+//收到进度信息，做进度条
 ipcRenderer.on("downloadProgress", (event, data) => {
   downloadInfo.value = data;
 });
 
-// 11. 下载完成，反馈给用户是否立即更新
+//  下载完成，反馈给用户是否立即更新
 ipcRenderer.on("updateDownloaded", (event, data) => {
   ifUpdateing.value = false;
   ifInstall.value = true;
 });
 
-// 12. 告诉主进程，立即更新
+//  告诉主进程，立即更新
 function updateNow() {
   ipcRenderer.send("updateNow");
 }
 
-// 6. 点击确认更新
+// 点击确认更新
 function comfirmUpdate() {
   ipcRenderer.send("comfirmUpdate"); //发送下载请求
   ifUpdate.value = false; //关闭本窗口
@@ -63,6 +63,7 @@ function closeDownloadDig() {
 
 <template>
   <searchAttribute />
+
   <!-- 提示更新 -->
   <el-dialog v-model="ifUpdate" title="版本更新">
     <span>有新版本,Version:{{ updateInfo.version }},是否更新</span>

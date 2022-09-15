@@ -14,8 +14,8 @@ function createWindow() {
     width: 1650,
     height: 800,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
+      nodeIntegration: true,//允许渲染端（vue）使用node环境
+      contextIsolation: false,//关闭上下文隔离，否则无法直接通信
       nodeIntegrationInWorker: true,
       // preload: path.join(__dirname, "preload.js"),
     },
@@ -33,43 +33,44 @@ function checkUpdate() {
   autoUpdater.setFeedURL("http://www.mr-hei.tech:88/searchUpdate/");
 
   // 是否自动更新，如果为true，当可以更新时(update-available)自动执行更新下载。
-  autoUpdater.autoDownload = false;
+  autoUpdater.autoDownload = false; //关闭更新包自动下载
+  autoUpdater.autoInstallOnAppQuit = false; //安装包下载完成后，关闭应用时自动安装，配置为false让用户控制安装
   setTimeout(() => {
     autoUpdater.checkForUpdates();
   }, 3000);
-  // 1. 在渲染进程里触发获取更新，开始进行更新流程。 (根据具体需求)
+  //  在渲染进程里触发获取更新，开始进行更新流程。 (根据具体需求)
   ipcMain.on("checkForUpdates", (e, arg) => {
     autoUpdater.checkForUpdates();
   });
 
-  // 2. 开始检查是否有更新
+  //  开始检查是否有更新
   autoUpdater.on("checking-for-update", function () {
     // printUpdaterMessage("checking");
   });
 
-  // 3. 有更新时触发
+  //  有更新时触发
   autoUpdater.on("update-available", function (info) {
     printUpdaterMessage("updateAvailable");
-    // 4. 告诉渲染进程有更新，info包含新版本信息
+    // 告诉渲染进程有更新，info包含新版本信息
     win.webContents.send("updateAvailable", info);
   });
 
-  // 7. 收到确认更新提示，执行下载
+  //  收到确认更新提示，执行下载
   ipcMain.on("comfirmUpdate", () => {
     autoUpdater.downloadUpdate();
   });
 
-  // 8. 下载进度，包含进度百分比、下载速度、已下载字节、总字节等
-  // ps: 调试时，想重复更新，会因为缓存导致该事件不执行，下载直接完成，可找到C:\Users\40551\AppData\Local\xxx-updater\pending下的缓存文件将其删除（这是我本地的路径）
+  // 下载进度，包含进度百分比、下载速度、已下载字节、总字节等
+  // 调试时，想重复更新，会因为缓存导致该事件不执行，下载直接完成，可找到C:\Users\{{username}}\AppData\Local\xxx(本应用名)-updater\pending下的缓存文件将其删除
   autoUpdater.on("download-progress", function (progressObj) {
     // printUpdaterMessage("downloadProgress");
     win.webContents.send("downloadProgress", progressObj);
   });
 
-  // 10. 下载完成，告诉渲染进程，是否立即执行更新安装操作
+  // 下载完成，告诉渲染进程，是否立即执行更新安装操作
   autoUpdater.on("update-downloaded", function () {
     win.webContents.send("updateDownloaded");
-    // 12. 立即更新安装
+    //  立即更新安装
     ipcMain.on("updateNow", (e, arg) => {
       autoUpdater.quitAndInstall();
     });
