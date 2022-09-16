@@ -7,31 +7,31 @@ const ifUpdateing = ref(false); //更新进度弹窗
 const ifInstall = ref(false); //安装提示弹窗
 const updateInfo = ref({}); //更新内容
 const downloadInfo = ref({}); //下载进度
-if (typeof require != "undefined") {
-  //非electron环境没有require，判断为非electron时不使用ipc
-  const ipcRenderer = require("electron").ipcRenderer;
-  // 收到主进程可更新的消息，做自己的业务逻辑
-  ipcRenderer.on("updateAvailable", (event, data) => {
-    updateInfo.value = data;
-    ifUpdate.value = true;
-  });
 
-  //打印消息
-  ipcRenderer.on("printUpdaterMessage", (event, data) => {
-    ElMessage.success(data);
-  });
+//非electron环境没有require，判断为非electron时不使用ipc
+const ipcRenderer = require("electron").ipcRenderer;
+// 收到主进程可更新的消息，做自己的业务逻辑
+ipcRenderer.on("updateAvailable", (event, data) => {
+  updateInfo.value = data;
+  ifUpdate.value = true;
+});
 
-  //收到进度信息，做进度条
-  ipcRenderer.on("downloadProgress", (event, data) => {
-    downloadInfo.value = data;
-  });
+//打印消息
+ipcRenderer.on("printUpdaterMessage", (event, data) => {
+  ElMessage.success(data);
+});
 
-  //  下载完成，反馈给用户是否立即更新
-  ipcRenderer.on("updateDownloaded", (event, data) => {
-    ifUpdateing.value = false;
-    ifInstall.value = true;
-  });
-}
+//收到进度信息，做进度条
+ipcRenderer.on("downloadProgress", (event, data) => {
+  downloadInfo.value = data;
+});
+
+//  下载完成，反馈给用户是否立即更新
+ipcRenderer.on("updateDownloaded", (event, data) => {
+  ifUpdateing.value = false;
+  ifInstall.value = true;
+});
+
 //  告诉主进程，立即更新
 function updateNow() {
   ipcRenderer.send("updateNow");
@@ -51,13 +51,14 @@ function checkForUpdates() {
 
 //关闭下载进度回调
 function closeDownloadDig() {
-  ElMessageBox.confirm("正在下载更新包,确定取消下载么", "Warning", {
+  ElMessageBox.confirm("关闭后将转到后台下载,下载完成提示安装", "TIPS", {
     confirmButtonText: "后台下载",
+    cancelButtonText: "取消",
     type: "warning",
     center: true,
   }).then(() => {
     ifUpdateing.value = false;
-    ElMessage.success("转入后台下载，下载完成后将通知安装");
+    ElMessage.success("已转入后台下载，下载完成后将通知安装");
   });
 }
 </script>
@@ -67,8 +68,9 @@ function closeDownloadDig() {
 
   <!-- 提示更新 -->
   <el-dialog v-model="ifUpdate" title="版本更新">
-    <span>有新版本,Version:{{ updateInfo.version }},是否更新</span>
-    <span>note:{{ updateInfo.note }}</span>
+    <div>有新版本,Version:{{ updateInfo.version }},是否更新</div>
+    <p>更新内容:</p>
+    <pre>{{ updateInfo.note }}</pre>
     <div class="digbtns">
       <el-button type="primary" @click="comfirmUpdate">立即更新</el-button>
       <el-button @click="ifUpdate = false">忽略更新</el-button>
@@ -77,10 +79,14 @@ function closeDownloadDig() {
 
   <!-- 下载进度 -->
   <el-dialog v-model="ifUpdateing" title="下载中" :before-close="closeDownloadDig">
-    <el-progress :text-inside="true" :stroke-width="26" :percentage="downloadInfo.percent.toFixed(2)" />
+    <el-progress :text-inside="true" :stroke-width="26" :percentage="downloadInfo.percent ? downloadInfo.percent.toFixed(2) : 0" />
     <div class="progressinfo">
-      <span>速度:{{ (downloadInfo.bytesPerSecond / 102400).toFixed(2) }}Mbps</span>
-      <span>{{ (downloadInfo.transferred / 1000000).toFixed(2) }}mb/{{ (downloadInfo.total / 1000000).toFixed(2) }}mb</span>
+      <span>速度:{{ downloadInfo.bytesPerSecond ? (downloadInfo.bytesPerSecond / 102400).toFixed(2) : 0 }}Mbps</span>
+      <span
+        >{{ downloadInfo.transferred ? (downloadInfo.transferred / 1000000).toFixed(2) : 0 }}mb/{{
+          downloadInfo.total ? (downloadInfo.total / 1000000).toFixed(2) : 0
+        }}mb</span
+      >
     </div>
   </el-dialog>
 

@@ -57,6 +57,8 @@ function checkUpdate() {
 
   //  收到确认更新提示，执行下载
   ipcMain.on("comfirmUpdate", () => {
+    // 开始下载
+    console.log('开始下载');
     autoUpdater.downloadUpdate();
   });
 
