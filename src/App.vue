@@ -28,8 +28,8 @@ ipcRenderer.on("downloadProgress", (event, data) => {
 
 //  下载完成，反馈给用户是否立即更新
 ipcRenderer.on("updateDownloaded", (event, data) => {
-  ifUpdateing.value = false;
   ifInstall.value = true;
+  ifUpdateing.value = false;
 });
 
 //  告诉主进程，立即更新
@@ -40,8 +40,8 @@ function updateNow() {
 // 点击确认更新
 function comfirmUpdate() {
   ipcRenderer.send("comfirmUpdate"); //发送下载请求
-  ifUpdate.value = false; //关闭本窗口
   ifUpdateing.value = true; //打开下载进度窗口
+  ifUpdate.value = false; //关闭本窗口
 }
 
 // 触发检查更新
@@ -67,7 +67,7 @@ function closeDownloadDig() {
   <searchAttribute />
 
   <!-- 提示更新 -->
-  <el-dialog v-model="ifUpdate" title="版本更新">
+  <el-dialog v-model="ifUpdate" title="版本更新" draggable>
     <div>有新版本,Version:{{ updateInfo.version }},是否更新</div>
     <p>更新内容:</p>
     <pre>{{ updateInfo.note }}</pre>
@@ -78,7 +78,7 @@ function closeDownloadDig() {
   </el-dialog>
 
   <!-- 下载进度 -->
-  <el-dialog v-model="ifUpdateing" title="下载中" :before-close="closeDownloadDig">
+  <el-dialog v-model="ifUpdateing" title="下载中" :before-close="closeDownloadDig" draggable>
     <el-progress :text-inside="true" :stroke-width="26" :percentage="downloadInfo.percent ? downloadInfo.percent.toFixed(2) : 0" />
     <div class="progressinfo">
       <span>速度:{{ downloadInfo.bytesPerSecond ? (downloadInfo.bytesPerSecond / 102400).toFixed(2) : 0 }}Mbps</span>
@@ -91,7 +91,7 @@ function closeDownloadDig() {
   </el-dialog>
 
   <!-- 下载完成提示安装 -->
-  <el-dialog v-model="ifInstall" title="下载完成,是否立即安装" center>
+  <el-dialog v-model="ifInstall" title="下载完成,是否立即安装" center draggable>
     <div class="digbtns">
       <el-button type="primary" @click="updateNow">立即安装</el-button>
       <el-button @click="ifInstall = false">下次安装</el-button>
