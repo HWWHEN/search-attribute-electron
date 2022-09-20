@@ -13,9 +13,10 @@ function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 1650,
     height: 800,
+    show: false,
     webPreferences: {
-      nodeIntegration: true,//允许渲染端（vue）使用node环境
-      contextIsolation: false,//关闭上下文隔离，否则无法直接通信
+      nodeIntegration: true, //允许渲染端（vue）使用node环境
+      contextIsolation: false, //关闭上下文隔离，否则无法直接通信
       nodeIntegrationInWorker: true,
       // preload: path.join(__dirname, "preload.js"),
     },
@@ -26,6 +27,7 @@ function createWindow() {
   // 打开开发工具
   // mainWindow.webContents.openDevTools();
   win = mainWindow;
+  mainWindow.show();
 }
 
 function checkUpdate() {
@@ -58,7 +60,7 @@ function checkUpdate() {
   //  收到确认更新提示，执行下载
   ipcMain.on("comfirmUpdate", () => {
     // 开始下载
-    console.log('开始下载');
+    console.log("开始下载");
     autoUpdater.downloadUpdate();
   });
 
