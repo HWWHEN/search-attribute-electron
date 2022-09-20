@@ -9,34 +9,35 @@ const updateInfo = ref({}); //更新内容
 const downloadInfo = ref({}); //下载进度
 
 //非electron环境没有require，判断为非electron时不使用ipc
-const ipcRenderer = require("electron").ipcRenderer;
-// 收到主进程可更新的消息，做自己的业务逻辑
-ipcRenderer.on("updateAvailable", (event, data) => {
-  updateInfo.value = data;
-  ifUpdate.value = true;
-});
+if (typeof process !== "undefined" && process.versions != null && process.versions.node != null) {
+  const ipcRenderer = require("electron").ipcRenderer;
+  // 收到主进程可更新的消息，做自己的业务逻辑
+  ipcRenderer.on("updateAvailable", (event, data) => {
+    updateInfo.value = data;
+    ifUpdate.value = true;
+  });
 
-//打印消息
-ipcRenderer.on("printUpdaterMessage", (event, data) => {
-  ElMessage.success(data);
-});
+  //打印消息
+  ipcRenderer.on("printUpdaterMessage", (event, data) => {
+    ElMessage.success(data);
+  });
 
-//收到进度信息，做进度条
-ipcRenderer.on("downloadProgress", (event, data) => {
-  downloadInfo.value = data;
-});
+  //收到进度信息，做进度条
+  ipcRenderer.on("downloadProgress", (event, data) => {
+    downloadInfo.value = data;
+  });
 
-//  下载完成，反馈给用户是否立即更新
-ipcRenderer.on("updateDownloaded", (event, data) => {
-  ifInstall.value = true;
-  ifUpdateing.value = false;
-});
+  //  下载完成，反馈给用户是否立即更新
+  ipcRenderer.on("updateDownloaded", (event, data) => {
+    ifInstall.value = true;
+    ifUpdateing.value = false;
+  });
 
-//  告诉主进程，立即更新
-function updateNow() {
-  ipcRenderer.send("updateNow");
+  //  告诉主进程，立即更新
+  function updateNow() {
+    ipcRenderer.send("updateNow");
+  }
 }
-
 // 点击确认更新
 function comfirmUpdate() {
   ipcRenderer.send("comfirmUpdate"); //发送下载请求
