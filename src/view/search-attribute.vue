@@ -149,7 +149,7 @@ onMounted(() => {
               <span class="card-head">全部词条</span>
             </template>
             <div>
-              <el-input v-model="state.queryParams.keywork" placeholder="关键词搜索(空格隔开)" @input="search" class="input" />
+              <el-input v-model="state.queryParams.keywork" placeholder="关键词搜索(空格隔开)" @input="search" class="input" clearable/>
               <el-scrollbar always>
                 <el-table v-loading="state.loading" :data="state.quertList.length == 0 ? state.entrieList : state.quertList" height="calc(100vh - 150px)">
                   <el-table-column label="词条描述" align="center" prop="name" />
